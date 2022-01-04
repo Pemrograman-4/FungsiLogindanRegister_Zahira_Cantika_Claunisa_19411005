@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:zahira_cantika_c_19411005/server/server.dart';
+import 'package:zahira_cantika_c_19411005/ui/detail_produk.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProdukView extends StatelessWidget {
   final String apiUrl = UrlServer + "produk/get";
@@ -23,6 +25,22 @@ class ProdukView extends StatelessWidget {
     } on SocketException catch (_) {}
     return [];
   }
+  void setDetail(BuildContext context,id, merk, deskripsi, size,warna)async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('_id', id);
+    await prefs.setString('merk', merk);
+    await prefs.setString('deskripsi', deskripsi);
+    await prefs.setString('size', size);
+    await prefs.setString('warna', warna);
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) =>
+                detail_produk_view(id:id, warna: warna,deskrispi:warna,
+                    merk: merk,size: size)));
+
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +58,11 @@ class ProdukView extends StatelessWidget {
                   itemCount: snapshot.data.length,
                   itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
+                      onTap: () =>
+                          setDetail(context,snapshot.data[index]['_id'],snapshot.data[index]['merk'],
+                            snapshot.data[index]['deskripsi'],snapshot.data[index]['size'],
+                            snapshot.data[index]['warna'],
+                          ),
                       child: SizedBox(
                         height: 150,
                         width: 150,
